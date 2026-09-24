@@ -5,10 +5,10 @@ RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/inst
   && arduino-cli config init --overwrite \
   && arduino-cli core update-index \
   && arduino-cli core install arduino:avr \
-  && arduino-cli lib update-index \
-  && arduino-cli lib install "Adafruit Motor Shield library" \
-  && arduino-cli lib install Servo
+  && arduino-cli lib update-index
 WORKDIR /app
+COPY libs.txt ./
+RUN grep -v '^#' libs.txt | grep -v '^[[:space:]]*$' | while IFS= read -r l; do arduino-cli lib install "$l" || echo "AVISO: nao instalou $l"; done; true
 COPY server.js index.html ./
 ENV NODE_ENV=production
 CMD ["node", "server.js"]

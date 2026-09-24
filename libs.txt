@@ -1,0 +1,18 @@
+# Uma biblioteca por linha (nome exato do Gerenciador de Bibliotecas da Arduino).
+# Linhas com # são ignoradas. Depois de editar este arquivo no GitHub, o Render refaz o site sozinho.
+Adafruit Motor Shield library
+Servo
+DHT sensor library
+Adafruit Unified Sensor
+NewPing
+LiquidCrystal I2C
+Adafruit NeoPixel
+IRremote
+OneWire
+DallasTemperature
+Adafruit GFX Library
+Adafruit SSD1306
+MPU6050
+Keypad
+RTClib
+MFRC522

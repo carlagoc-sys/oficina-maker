@@ -3,49 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Oficina Maker · Editor Arduino</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<title>AD IDE for Chromebook</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 28%22><rect x=%224%22 y=%222%22 width=%2234%22 height=%2224%22 rx=%224%22 fill=%22%230b7a6b%22/><rect y=%229%22 width=%2210%22 height=%2210%22 rx=%221%22 fill=%22%230b7a6b%22/><rect x=%2218%22 y=%229%22 width=%2212%22 height=%2210%22 rx=%221%22 fill=%22white%22/></svg>">
 <style>
-:root{--bg:#f3f6f4;--pn:#fff;--tx:#17302b;--mu:#5d746e;--ln:#cfdad6;--ac:#0b7a6b;--ac2:#fff;--ed:#fbfdfc;--er:#b3261e;--ok:#16794a}
-@media(prefers-color-scheme:dark){:root:not([data-t=l]){--bg:#0f1d1a;--pn:#16292520;--tx:#e3f0ec;--mu:#8fa8a1;--ln:#2a423d;--ac:#3fd0b8;--ac2:#06231e;--ed:#0b1614;--er:#ff8a80;--ok:#6ee7a8}}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--tx);font:16px/1.4 "Nunito","Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 14px;border-bottom:2px solid var(--ln)}
-h1{font-size:1.25rem;margin:0 auto 0 0;font-weight:800}
-button,select{font:inherit;min-height:44px;border-radius:12px;border:2px solid var(--ln);background:var(--pn);color:var(--tx);padding:0 14px}
-button{font-weight:800;cursor:pointer}
+:root{--bg:#eef3f1;--pn:#fff;--tx:#17302b;--mu:#5d746e;--ln:#d3ddd9;--ac:#0b7a6b;--ac2:#fff;--ed:#fbfdfc;--gu:#f0f5f3;--er:#b3261e;--ok:#16794a;--c:#6b7f79;--s:#b45309;--k:#7c3aed;--f:#0b6bcb;--n:#c2410c;--p:#0f766e}
+@media(prefers-color-scheme:dark){:root{--bg:#0c1715;--pn:#13231f;--tx:#e3f0ec;--mu:#8fa8a1;--ln:#26403a;--ac:#3fd0b8;--ac2:#06231e;--ed:#0a1412;--gu:#0e1b18;--er:#ff8a80;--ok:#6ee7a8;--c:#7f9a93;--s:#f5c07a;--k:#c4a7ff;--f:#7cc4ff;--n:#ff9e7a;--p:#6ee7c8}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 "Nunito","Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;background:var(--pn);border-bottom:1px solid var(--ln)}
+.logo{display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo span{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--ac);color:var(--ac2)}
+.logo b{font-size:1.2rem;font-weight:800;line-height:1.1}.logo small{display:block;color:var(--mu);font-size:.75rem;font-weight:600}
+button,select{font:inherit;font-weight:700;min-height:42px;border-radius:11px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);padding:0 14px;cursor:pointer}
+button:hover{border-color:var(--ac)}
 button.main{background:var(--ac);color:var(--ac2);border-color:var(--ac)}
+button.g{min-height:30px;font-size:.8rem;padding:0 10px;background:transparent}
 button:disabled{opacity:.5;cursor:wait}
 :focus-visible{outline:3px solid var(--ac);outline-offset:2px}
-#st{padding:6px 14px;color:var(--mu);font-size:.9rem}
-main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 340px;gap:10px;padding:0 14px 14px}
-.ed{display:flex;min-height:0;border:2px solid var(--ln);border-radius:14px;overflow:hidden;background:var(--ed)}
-#nums{padding:12px 8px;text-align:right;color:var(--mu);font:14px/1.5 ui-monospace,Consolas,monospace;overflow:hidden;user-select:none;border-right:2px solid var(--ln)}
-#code{flex:1;border:0;resize:none;outline:0;padding:12px;background:transparent;color:var(--tx);font:14px/1.5 ui-monospace,Consolas,monospace;white-space:pre;tab-size:2}
-#out{border:2px solid var(--ln);border-radius:14px;padding:10px 12px;overflow:auto;font:13px/1.45 ui-monospace,Consolas,monospace;background:var(--pn);min-height:0}
-#out div{white-space:pre-wrap;word-break:break-word}.err{color:var(--er)}.ok{color:var(--ok)}
-progress{width:100%;height:10px;accent-color:var(--ac)}
-@media(max-width:800px){main{grid-template-columns:1fr;grid-template-rows:1fr 180px}}
+#st{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--mu);font-size:.88rem;font-weight:600}
+#st::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--mu);opacity:.5}
+#st.on{color:var(--ok)}#st.on::before{background:var(--ok);opacity:1}
+main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 360px;gap:12px;padding:0 16px 16px}
+.ed{display:flex;min-height:0;min-width:0;border:1px solid var(--ln);border-radius:14px;overflow:hidden;background:var(--ed)}
+#nums,#hl,#code{font:14px/1.6 ui-monospace,"Cascadia Code",Consolas,monospace;margin:0;tab-size:2;white-space:pre}
+#nums{flex:none;min-width:3.4em;padding:14px 12px 14px 0;text-align:right;color:var(--mu);background:var(--gu);border-right:1px solid var(--ln);overflow:hidden;user-select:none}
+.cw{position:relative;flex:1;min-width:0}
+#hl,#code{position:absolute;inset:0;width:100%;height:100%;padding:14px}
+#hl{overflow:hidden;pointer-events:none;color:var(--tx)}
+#code{border:0;resize:none;outline:0;background:transparent;color:transparent;caret-color:var(--tx);overflow:auto;border-radius:0}
+#hl i{font-style:normal}#hl .c{color:var(--c);font-style:italic}#hl .s{color:var(--s)}#hl .k{color:var(--k);font-weight:700}#hl .f{color:var(--f)}#hl .n{color:var(--n)}#hl .p{color:var(--p)}
+.con{display:flex;flex-direction:column;min-height:0;border:1px solid var(--ln);border-radius:14px;background:var(--pn);overflow:hidden}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--ln);font-weight:800}
+progress{width:100%;height:6px;accent-color:var(--ac);display:block}progress[hidden]{display:none}
+#out{flex:1;overflow:auto;padding:10px 12px;font:13px/1.5 ui-monospace,Consolas,monospace}
+#out div{white-space:pre-wrap;word-break:break-word;padding:2px 0}.err{color:var(--er)}.ok{color:var(--ok);font-weight:700}
+dialog{border:1px solid var(--ln);border-radius:14px;background:var(--pn);color:var(--tx);padding:0;width:min(520px,92vw);max-height:80vh}
+dialog[open]{display:flex;flex-direction:column}dialog::backdrop{background:#0009}
+#dq{margin:10px 12px;min-height:40px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);padding:0 10px;font:inherit}
+#dl{overflow:auto}.lb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--ln);font-size:.9rem}
+@media(max-width:860px){main{grid-template-columns:1fr;grid-template-rows:1fr 190px}}
 </style>
 </head>
 <body>
 <header>
-  <h1>🤖 Oficina Maker</h1>
+  <div class="logo"><span><svg viewBox="0 0 40 28" width="32" height="22" fill="none" stroke="currentColor" aria-hidden="true"><rect x="4" y="2" width="34" height="24" rx="4" stroke-width="2"/><rect x="0" y="9" width="10" height="10" rx="1" fill="currentColor" stroke="none"/><rect x="18" y="9" width="12" height="10" rx="1" fill="currentColor" stroke="none"/><path d="M14 5.5H34M14 22.5H34" stroke-width="3" stroke-dasharray="2.2 1.8"/></svg></span><div><b>AD IDE</b><small>for Chromebook</small></div></div>
   <select id="board" aria-label="Placa">
     <option value="arduino:avr:mega">Arduino Mega 2560</option>
     <option value="arduino:avr:uno">Arduino Uno (só verificar)</option>
   </select>
-  <button id="bCon">Conectar USB</button>
-  <button id="bVer">Verificar</button>
-  <button id="bUp" class="main">Enviar para a placa</button>
-  <button id="bDl" title="Baixar o código">Baixar .ino</button>
+  <button id="bCon">🔌 Conectar USB</button>
+  <button id="bVer">✔ Verificar</button>
+  <button id="bUp" class="main">⬆ Enviar para a placa</button>
+  <button id="bLib">📚 Bibliotecas</button>
+  <button id="bDl" title="Baixar o código">⬇ .ino</button>
 </header>
-<div id="st">Placa: não conectada</div>
+<div id="st">Placa não conectada</div>
 <main>
-  <div class="ed"><div id="nums">1</div><textarea id="code" spellcheck="false" aria-label="Código"></textarea></div>
-  <div><progress id="pg" value="0" max="100" hidden></progress><div id="out" role="log" style="height:calc(100% - 4px)"></div></div>
+  <section class="ed"><div id="nums">1</div><div class="cw"><pre id="hl" aria-hidden="true"></pre><textarea id="code" wrap="off" spellcheck="false" aria-label="Código"></textarea></div></section>
+  <aside class="con"><div class="ch"><span>Mensagens</span><button id="bClr" class="g">Limpar</button></div><progress id="pg" value="0" max="100" hidden></progress><div id="out" role="log"></div></aside>
 </main>
+<dialog id="dlg"><div class="ch"><span>Bibliotecas disponíveis</span><button id="dX" class="g">Fechar</button></div><input id="dq" placeholder="Buscar… (ex.: servo, dht, lcd)" aria-label="Buscar biblioteca"><div id="dl"></div></dialog>
 <script type="text/plain" id="ex">#include <AFMotor.h>
 #include <Servo.h>
 
@@ -127,12 +144,22 @@ const KNOWN = { '2341:0042': 'Arduino Mega 2560', '2341:0010': 'Arduino Mega 256
 
 // Editor
 const code = $('code');
-const nums = () => { $('nums').textContent = Array.from({ length: code.value.split('\n').length }, (_, i) => i + 1).join('\n'); };
+const KW = /^(if|else|for|while|do|switch|case|default|break|continue|return|void|int|char|long|short|byte|bool|boolean|float|double|unsigned|uint8_t|uint16_t|const|static|struct|class|true|false|HIGH|LOW|INPUT|OUTPUT|FORWARD|BACKWARD|RELEASE)$/;
+function hl(t) {
+  const e = t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return e.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(^[ \t]*#[^\n]*)|\b(\d+\.?\d*)\b|\b([A-Za-z_]\w*)\b(\s*\()?/gm,
+    (m, c, s, p, n, w, fn) => c ? `<i class="c">${m}</i>` : s ? `<i class="s">${m}</i>` : p ? `<i class="p">${m}</i>` : n ? `<i class="n">${m}</i>`
+      : KW.test(w) ? `<i class="k">${w}</i>${fn || ''}` : fn ? `<i class="f">${w}</i>${fn}` : m);
+}
+const nums = () => {
+  $('nums').textContent = Array.from({ length: code.value.split('\n').length }, (_, i) => i + 1).join('\n');
+  $('hl').innerHTML = hl(code.value) + '\n';
+};
 try { code.value = localStorage.getItem('om-code') || ''; } catch {}
 if (!code.value) code.value = $('ex').textContent.trimStart();
 nums();
 code.addEventListener('input', () => { nums(); try { localStorage.setItem('om-code', code.value); } catch {} });
-code.addEventListener('scroll', () => { $('nums').scrollTop = code.scrollTop; });
+code.addEventListener('scroll', () => { $('nums').scrollTop = code.scrollTop; $('hl').scrollTop = code.scrollTop; $('hl').scrollLeft = code.scrollLeft; });
 code.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '  '); } });
 $('bDl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([code.value])); a.download = 'sketch.ino'; a.click(); };
 
@@ -156,7 +183,7 @@ async function connect() {
   if (!('serial' in navigator)) throw new Error('Este navegador não tem Web Serial. Use o Chrome.');
   port = await navigator.serial.requestPort();
   const i = port.getInfo(), k = i.usbVendorId?.toString(16).padStart(4, '0') + ':' + i.usbProductId?.toString(16).padStart(4, '0');
-  $('st').textContent = 'Placa conectada: ' + (KNOWN[k] || 'dispositivo USB (' + k + ')');
+  $('st').textContent = 'Placa conectada: ' + (KNOWN[k] || 'dispositivo USB (' + k + ')'); $('st').className = 'on';
   log('USB conectada: ' + (KNOWN[k] || k));
 }
 
@@ -238,6 +265,31 @@ async function run(fn) {
   busy = false; document.querySelectorAll('button').forEach(b => b.disabled = false);
 }
 $('bCon').onclick = () => run(connect);
+$('bClr').onclick = () => $('out').replaceChildren();
+// Bibliotecas
+let LIBS = null;
+async function libs() {
+  if (!LIBS) { try { LIBS = (await (await fetch('/api/libs')).json()).libs; } catch { LIBS = []; } }
+  const q = $('dq').value.toLowerCase();
+  const rows = LIBS.filter(l => (l.name + ' ' + l.inc.join(' ')).toLowerCase().includes(q));
+  const mk = l => {
+    const d = document.createElement('div'); d.className = 'lb';
+    const t = document.createElement('span'); t.textContent = l.name + ' — ' + l.inc[0];
+    const b = document.createElement('button'); b.className = 'g'; b.textContent = 'Inserir #include';
+    b.onclick = () => {
+      const inc = '#include <' + l.inc[0] + '>';
+      if (!code.value.includes(inc)) { code.value = inc + '\n' + code.value; code.dispatchEvent(new Event('input')); }
+      log('Adicionado: ' + inc); $('dlg').close();
+    };
+    d.append(t, b); return d;
+  };
+  const vazio = document.createElement('div'); vazio.className = 'lb';
+  vazio.textContent = LIBS.length ? 'Nada encontrado.' : 'Não consegui carregar a lista do servidor.';
+  $('dl').replaceChildren(...(rows.length ? rows.map(mk) : [vazio]));
+}
+$('bLib').onclick = () => { $('dlg').showModal(); libs(); };
+$('dq').oninput = libs; $('dX').onclick = () => $('dlg').close();
+
 $('bVer').onclick = () => run(compile);
 $('bUp').onclick = () => run(async () => {
   if ($('board').value !== 'arduino:avr:mega') throw new Error('O envio funciona só para o Mega 2560 nesta versão. Use Verificar.');
