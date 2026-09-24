@@ -41,6 +41,8 @@ dialog{border:1px solid var(--ln);border-radius:14px;background:var(--pn);color:
 dialog[open]{display:flex;flex-direction:column}dialog::backdrop{background:#0009}
 #dq{margin:10px 12px;min-height:40px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);padding:0 10px;font:inherit}
 #dl{overflow:auto}.lb{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--ln);font-size:.9rem}
+.lc{padding:10px 12px;border-top:1px solid var(--ln)}.lc b{display:block}.lc small{color:var(--mu)}.lc p{margin:4px 0 8px;font-size:.88rem}.lc button{min-height:36px}
+#dp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:0 12px 8px}.mu{color:var(--mu);font-size:.85rem}
 @media(max-width:860px){main{grid-template-columns:1fr;grid-template-rows:1fr 190px}}
 </style>
 </head>
@@ -62,7 +64,7 @@ dialog[open]{display:flex;flex-direction:column}dialog::backdrop{background:#000
   <section class="ed"><div id="nums">1</div><div class="cw"><pre id="hl" aria-hidden="true"></pre><textarea id="code" wrap="off" spellcheck="false" aria-label="Código"></textarea></div></section>
   <aside class="con"><div class="ch"><span>Mensagens</span><button id="bClr" class="g">Limpar</button></div><progress id="pg" value="0" max="100" hidden></progress><div id="out" role="log"></div></aside>
 </main>
-<dialog id="dlg"><div class="ch"><span>Bibliotecas disponíveis</span><button id="dX" class="g">Fechar</button></div><input id="dq" placeholder="Buscar… (ex.: servo, dht, lcd)" aria-label="Buscar biblioteca"><div id="dl"></div></dialog>
+<dialog id="dlg"><div class="ch"><span>📚 Bibliotecas</span><button id="dX" class="g">Fechar</button></div><input id="dq" placeholder="Buscar em todas as bibliotecas… (ex.: DHT, FastLED, LCD)" aria-label="Buscar biblioteca"><div id="dp"></div><div id="dl"></div></dialog>
 <script type="text/plain" id="ex">#include <AFMotor.h>
 #include <Servo.h>
 
@@ -165,12 +167,12 @@ $('bDl').onclick = () => { const a = document.createElement('a'); a.href = URL.c
 
 // Compilação (no servidor)
 async function compile() {
-  log('Compilando… (a primeira vez pode demorar)');
+  log('Compilando… (bibliotecas novas podem levar alguns minutos na primeira vez)');
   const h = { 'Content-Type': 'application/json', 'x-pin': sessionStorage.getItem('om-pin') || '' };
-  let r = await fetch('/api/compile', { method: 'POST', headers: h, body: JSON.stringify({ code: code.value, fqbn: $('board').value }) });
+  let r = await fetch('/api/compile', { method: 'POST', headers: h, body: JSON.stringify({ code: code.value, fqbn: $('board').value, libs: PL }) });
   if (r.status === 401) {
     const p = prompt('Digite o PIN da oficina:'); sessionStorage.setItem('om-pin', p || ''); h['x-pin'] = p || '';
-    r = await fetch('/api/compile', { method: 'POST', headers: h, body: JSON.stringify({ code: code.value, fqbn: $('board').value }) });
+    r = await fetch('/api/compile', { method: 'POST', headers: h, body: JSON.stringify({ code: code.value, fqbn: $('board').value, libs: PL }) });
   }
   const j = await r.json();
   if (!j.ok) { log(j.log, 'err'); throw new Error('Há erros no código. Leia as mensagens acima.'); }
@@ -266,29 +268,41 @@ async function run(fn) {
 }
 $('bCon').onclick = () => run(connect);
 $('bClr').onclick = () => $('out').replaceChildren();
-// Bibliotecas
-let LIBS = null;
+// Bibliotecas (busca em todo o índice da Arduino; o servidor instala ao compilar)
+let PL = []; try { PL = JSON.parse(localStorage.getItem('om-libs') || '[]'); } catch {}
+const savePL = () => { try { localStorage.setItem('om-libs', JSON.stringify(PL)); } catch {} };
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+let kit = null, timer;
+function chips() {
+  $('dp').replaceChildren(...(PL.length ? [el('span', 'mu', 'Neste projeto:'), ...PL.map(n => {
+    const b = el('button', 'g', n + ' ✕'); b.onclick = () => { PL = PL.filter(x => x !== n); savePL(); chips(); }; return b;
+  })] : []));
+}
+function include(l) {
+  const h = l.inc && l.inc[0];
+  if (h) { const inc = '#include <' + h + '>'; if (!code.value.includes(inc)) { code.value = inc + '\n' + code.value; code.dispatchEvent(new Event('input')); } }
+  if (!PL.includes(l.name)) { PL.push(l.name); savePL(); }
+  log('Biblioteca adicionada: ' + l.name + (h ? ' (#include <' + h + '>)' : '')); chips();
+}
+function show(list, vazio, topo) {
+  const rows = list.map(l => {
+    const d = el('div', 'lc'); d.append(el('b', '', l.name), el('small', '', (l.author ? l.author + ' · ' : '') + (l.ver ? 'v' + l.ver : '')), el('p', '', l.text || ''));
+    const b = el('button', 'main', 'Incluir'); b.onclick = () => include(l); d.append(b); return d;
+  });
+  $('dl').replaceChildren(...(topo ? [el('div', 'lc mu', topo)] : []), ...(rows.length ? rows : [el('div', 'lc', vazio)]));
+}
 async function libs() {
-  if (!LIBS) { try { LIBS = (await (await fetch('/api/libs')).json()).libs; } catch { LIBS = []; } }
-  const q = $('dq').value.toLowerCase();
-  const rows = LIBS.filter(l => (l.name + ' ' + l.inc.join(' ')).toLowerCase().includes(q));
-  const mk = l => {
-    const d = document.createElement('div'); d.className = 'lb';
-    const t = document.createElement('span'); t.textContent = l.name + ' — ' + l.inc[0];
-    const b = document.createElement('button'); b.className = 'g'; b.textContent = 'Inserir #include';
-    b.onclick = () => {
-      const inc = '#include <' + l.inc[0] + '>';
-      if (!code.value.includes(inc)) { code.value = inc + '\n' + code.value; code.dispatchEvent(new Event('input')); }
-      log('Adicionado: ' + inc); $('dlg').close();
-    };
-    d.append(t, b); return d;
-  };
-  const vazio = document.createElement('div'); vazio.className = 'lb';
-  vazio.textContent = LIBS.length ? 'Nada encontrado.' : 'Não consegui carregar a lista do servidor.';
-  $('dl').replaceChildren(...(rows.length ? rows.map(mk) : [vazio]));
+  const q = $('dq').value.trim(); chips();
+  if (q.length < 2) {
+    if (!kit) { try { kit = (await (await fetch('/api/libs')).json()).libs; } catch { kit = []; } }
+    return show(kit, 'Não consegui carregar a lista do servidor.', 'Já instaladas no servidor. Digite acima para buscar em todas as bibliotecas da Arduino.');
+  }
+  $('dl').replaceChildren(el('div', 'lc', 'Buscando…'));
+  try { const j = await (await fetch('/api/libs/search?q=' + encodeURIComponent(q))).json(); if ($('dq').value.trim() === q) show(j.libs, 'Nada encontrado.'); }
+  catch { $('dl').replaceChildren(el('div', 'lc', 'Não consegui buscar. Tente de novo.')); }
 }
 $('bLib').onclick = () => { $('dlg').showModal(); libs(); };
-$('dq').oninput = libs; $('dX').onclick = () => $('dlg').close();
+$('dq').oninput = () => { clearTimeout(timer); timer = setTimeout(libs, 350); }; $('dX').onclick = () => $('dlg').close();
 
 $('bVer').onclick = () => run(compile);
 $('bUp').onclick = () => run(async () => {
