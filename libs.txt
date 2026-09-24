@@ -16,3 +16,6 @@ MPU6050
 Keypad
 RTClib
 MFRC522
+LiquidCrystal
+Stepper
+SD
